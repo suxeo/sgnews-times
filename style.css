@@ -1,0 +1,32 @@
+.head-line{  /*title 공간 생성*/
+    margin-top:1em;
+    display:flex;  /*svg의 부모 태그에 주어 img를 이동시켜 준다*/
+    justify-content: center;
+}
+.head-line svg{
+    width:430px;
+}
+.menus{
+    margin-top: 1em;
+    display:flex;  /*button들의 부모 태그에 flex를 주어 요소들 가운데로*/
+    justify-content: center;
+    flex-wrap:wrap;  /*화면 size를 줄여도 버튼이 모두 화면 안으로 들어가게*/
+    border-top: 1px solid #ebebeb;
+    border-bottom: 4px double black;
+}
+.menus button{
+    border:none;  /*버튼 모양의 border은 없다*/
+    background-color: none;  /*배경색은 없게*/
+    margin: 5px;
+}
+.menus button:hover{
+    background-color: beige;  /*버튼위에 가져다 댔을 때 beige색으로*/
+}
+.news-img-size{  /*col의 size를 초과한 부분을 고침*/
+    max-width:100%; /*부모의 100%니까 col-size를 초과하지 않을 정도의 100%*/
+    max-height:250px;  /*높이*/
+}
+.news{  /*news의 테두리(아래부분)를 그려줌*/
+    border-bottom: 1px solid black;
+    margin-top: 10px;
+}
