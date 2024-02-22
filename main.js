@@ -6,9 +6,9 @@ menus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(eve
 
 const getLatestNews = async () => {
   //최신 뉴스 들고 오는 코드(함수를 담은 변수)
-  // const url = new URL(
-    // 'https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?apiKey=${API_KEY}`);
-  const url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`)
+  const url = new URL(
+    `https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?apiKey=${API_KEY}`)
+  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`)
   // url이란 인스턴스 생성
   const response = await fetch(url); //url 호츌
   const data = await response.json(); //data는 body에 있고 body에서 json(파일 형식 중 하나)으로 뽑아와야함
@@ -23,9 +23,9 @@ const getNewsByCategory = async (event)=>{
   const category = event.target.textContent.toLowerCase(); 
   console.log("category", category);
   //뉴스 가져오기(url필요)
-  const url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`)
+  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`)
  
-  // const url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?category=${category}&apiKey=${API_KEY}`)
+  const url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?category=${category}&apiKey=${API_KEY}`)
   const response = await fetch(url);
   const data = await response.json();
   console.log("DDD",data);
@@ -36,7 +36,8 @@ const getNewsByCategory = async (event)=>{
 const getNewsByKeyword=async()=>{
   const keyword = document.getElementById("search-input").value;  //검색어 들고오기
   console.log("keyword",keyword);  //확인용
-  const url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`)
+  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`)
+  const url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?q=${keyword}&apiKey=${API_KEY}`)
 
   const response = await fetch(url);
   const data = await response.json();
