@@ -14,15 +14,19 @@ let url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=${AP
 let totalResult = 0;
 //임의로 정해줌
 let page = 1;
-const pageSize = 10; //10개씩 1page
-const groupSize = 5; //5개의 page씩 1group
+const pageSize = 10;  //10개씩 1page
+const groupSize = 5;  //5개의 page씩 1group
 
 
 //url 인스턴스 생성 함수(반복 코드)
 const getNews = async () => {
   try {
-  const response = await fetch(url);
+  //page,pageSize라는 파라미터를 붙여준 뒤(세팅) url 호출: &page=page
+  url.searchParams.set("page",page)
+  url.searchParams.set("pageSize",pageSize)
 
+  const response = await fetch(url);
+   
   const data = await response.json();
   if(response.status === 200){
     if(data.articles.length == 0){
@@ -136,25 +140,38 @@ const paginationRender = () =>{
   //totalResult
   //page
   //pageSize
-  //totalPage
   //groupSize: 한 그룹의 페이지 수 
 
+  //totalPage
+  const totalPage = Math.ceil(totalResult/pageSize)
   //pageGroup: 현재 속한 그룹
   const pageGroup = Math.ceil(page/groupSize);
   //lastPage
   const lastPage = groupSize*pageGroup;
+  //마지막 pageGroup이 groupSize보다 작다-ex)마지막 그룹의 페이지가 4가 마지막일 경우
+  // if(lastPage>totalPage){ //마지막 페이지(내가 정해준 groupSize)가 전체 page(실제)보다 클 때
+  //   lastPage = totalPage;
+  // }
+  
   //firstPage
-  const firstPage = lastPage-(groupSize-1);
+  const firstPage = lastPage-(groupSize-1) <= 0 ? 1 : lastPage-(groupSize-1);
 
   //부트스트랩의 pagination
   let paginationHTML=``;
 
   for(i=firstPage;i<=lastPage;i++){
-    paginationHTML += `<li class="page-item"><a class="page-link" href="#">${i}</a></li>`
+    paginationHTML += `<li class="page-item ${i === page ? "active" :""}" onclick="moveToPage(${i})"><a class="page-link">${i}</a></li>` 
   }
 
   document.querySelector(".pagination").innerHTML=paginationHTML
 }
+
+const moveToPage = (pageNum) => {
+  console.log("moveToPage",pageNum);
+  page = pageNum;
+  getNews();  //뉴스를 다시 가져오기
+}
+
 
 getLatestNews();
 
