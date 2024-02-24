@@ -6,8 +6,17 @@ console.log("menu",menus)  //확인용
 menus.forEach(menu=>menu.addEventListener("click",(event)=>getNewsByCategory(event))
 );
 //url의 내용을 바꾸기 위해 let 자료형
-let url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
-);
+//누나 api
+let url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=${API_KEY}`);
+//news api
+// let url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`);
+
+let totalResult = 0;
+//임의로 정해줌
+let page = 1;
+const pageSize = 10; //10개씩 1page
+const groupSize = 5; //5개의 page씩 1group
+
 
 //url 인스턴스 생성 함수(반복 코드)
 const getNews = async () => {
@@ -21,6 +30,7 @@ const getNews = async () => {
     }
     newsList = data.articles;
     render();  
+    paginationRender();
   }else{
     throw new Error(data.message); //console창에 data에 message 값
 
@@ -36,10 +46,10 @@ const getNews = async () => {
 const getLatestNews = async () => {
   //최신 뉴스 들고 오는 코드(함수를 담은 변수)
   //누나 api
-  // const url = new URL(
-    // `https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?apiKey=${API_KEY}`)
-  url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`)
- 
+  url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=${API_KEY}`);
+  //news api
+  // url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`)
+
   getNews();
 
 };
@@ -49,9 +59,11 @@ const getNewsByCategory = async (event)=>{
   const category = event.target.textContent.toLowerCase(); 
   console.log("category", category);
   //뉴스 가져오기(url필요)
-  url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`)
- //누나api
-  // const url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?category=${category}&apiKey=${API_KEY}`)
+  //누나api
+  url = new URL(`https://sugyeong-times.netlify.app//top-headlines?category=${category}&apiKey=${API_KEY}`)
+  //news api
+  // url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&category=${category}&apiKey=${API_KEY}`)
+
   
   getNews();
 
@@ -60,9 +72,10 @@ const getNewsByCategory = async (event)=>{
 const getNewsByKeyword=async()=>{
   const keyword = document.getElementById("search-input").value;  //검색어 들고오기
   console.log("keyword",keyword);  //확인용
-  url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`)
   //누나 api
-   // const url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=http://times-node-env.eba-appvq3ef.ap-northeast-2.elasticbeanstalk.com/top-headlines?q=${keyword}&apiKey=${API_KEY}`)
+  url = new URL(`https://sugyeong-times.netlify.app//top-headlines?q=${keyword}&apiKey=${API_KEY}`)
+  //news api
+  // url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&q=${keyword}&apiKey=${API_KEY}`)
 
   getNews();
 
@@ -115,6 +128,33 @@ const errorRender = (errorMessage) => {
   //news를 보여주는 곳 = error message 보여주는 곳
   document.getElementById("news-board").innerHTML = errorHTML;
 };
+
+//pagination함수
+const paginationRender = () =>{
+  //정하는 값
+
+  //totalResult
+  //page
+  //pageSize
+  //totalPage
+  //groupSize: 한 그룹의 페이지 수 
+
+  //pageGroup: 현재 속한 그룹
+  const pageGroup = Math.ceil(page/groupSize);
+  //lastPage
+  const lastPage = groupSize*pageGroup;
+  //firstPage
+  const firstPage = lastPage-(groupSize-1);
+
+  //부트스트랩의 pagination
+  let paginationHTML=``;
+
+  for(i=firstPage;i<=lastPage;i++){
+    paginationHTML += `<li class="page-item"><a class="page-link" href="#">${i}</a></li>`
+  }
+
+  document.querySelector(".pagination").innerHTML=paginationHTML
+}
 
 getLatestNews();
 
