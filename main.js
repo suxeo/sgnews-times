@@ -11,9 +11,9 @@ let url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=${AP
 //news api
 // let url = new URL(`https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`);
 
-let totalResult = 0;
 //임의로 정해줌
 let page = 1;
+let totalPage = 1;
 const pageSize = 10;  //10개씩 1page
 const groupSize = 5;  //5개의 page씩 1group
 
@@ -25,29 +25,34 @@ const getNews = async () => {
   url.searchParams.set("page",page)
   url.searchParams.set("pageSize",pageSize)
 
-  const response = await fetch(url);
-   
-  const data = await response.json();
+  let response = await fetch(url);
+  let data = await response.json();
+  //상태 괜찮
   if(response.status === 200){
+    console.log("result", data.totalResults);
     if(data.articles.length == 0){
       throw new Error("No result for this search!");
     }
     newsList = data.articles;
+    totalPage = Math.ceil(data.totalResults/pageSize);
     render();  
     paginationRender();
   }else{
+    page = 0;
+    totalPage = 0;
+    paginationRender();
     throw new Error(data.message); //console창에 data에 message 값
-
   } 
   }catch(error){
     errorRender(error.message);
+    page = 0;
+    totalPage = 0;
+    paginationRender(); 
   }
-  
 }; 
 
 
-
-const getLatestNews = async () => {
+const getLatestNews = () => {
   //최신 뉴스 들고 오는 코드(함수를 담은 변수)
   //누나 api
   url = new URL(`https://sugyeong-times.netlify.app//top-headlines?apiKey=${API_KEY}`);
@@ -73,9 +78,10 @@ const getNewsByCategory = async (event)=>{
 
 };
 
-const getNewsByKeyword=async()=>{
+const getNewsByKeyword= () =>{
   const keyword = document.getElementById("search-input").value;  //검색어 들고오기
   console.log("keyword",keyword);  //확인용
+  page = 1;
   //누나 api
   url = new URL(`https://sugyeong-times.netlify.app//top-headlines?q=${keyword}&apiKey=${API_KEY}`)
   //news api
@@ -88,7 +94,7 @@ const getNewsByKeyword=async()=>{
 /*render함수는 newsList가 확정이 되어야 사용가능*/
 const render = () => {
   /*뉴스를 그려주는 함수:render*/
-  const newsHTML = newsList
+  let newsHTML = newsList
     .map(
       (news) => `<div class="row news"> 
     <div class="col-lg-4">  
@@ -116,9 +122,7 @@ const render = () => {
     </div>
 <div>`
     )
-    .join(
-      ""
-    ); /*List(array)에 있는 news를 하나씩 들고 왔음=>map이 끝나면 newsHTML에 결과물 넣음*/ /*어떤 내용(여러개의 news)을 보여줄지*/
+    .join(""); /*List(array)에 있는 news를 하나씩 들고 왔음=>map이 끝나면 newsHTML에 결과물 넣음,어떤 내용(여러개의 news)을 보여줄지*/
   console.log("html", newsHTML);
 
   document.getElementById("news-board").innerHTML = newsHTML; /*news HTML을 Id인 section에 보여주는 코드*/
@@ -135,6 +139,7 @@ const errorRender = (errorMessage) => {
 
 //pagination함수
 const paginationRender = () =>{
+  let paginationHTML='';
   //정하는 값
 
   //totalResult
@@ -142,32 +147,53 @@ const paginationRender = () =>{
   //pageSize
   //groupSize: 한 그룹의 페이지 수 
 
-  //totalPage
-  const totalPage = Math.ceil(totalResult/pageSize)
+  //totalPage : 전체 page 수
+  // let totalPage = Math.ceil(totalResults/pageSize);
   //pageGroup: 현재 속한 그룹
-  const pageGroup = Math.ceil(page/groupSize);
+  let pageGroup = Math.ceil(page/groupSize);
   //lastPage
-  const lastPage = groupSize*pageGroup;
+  let lastPage = pageGroup*5;
+
   //마지막 pageGroup이 groupSize보다 작다-ex)마지막 그룹의 페이지가 4가 마지막일 경우
-  // if(lastPage>totalPage){ //마지막 페이지(내가 정해준 groupSize)가 전체 page(실제)보다 클 때
-  //   lastPage = totalPage;
-  // }
+  if(lastPage > totalPage){ //마지막 페이지(내가 정해준 groupSize)가 전체 page(실제)보다 클 때
+    lastPage = totalPage;
+  }
   
   //firstPage
-  const firstPage = lastPage-(groupSize-1) <= 0 ? 1 : lastPage-(groupSize-1);
+  let firstPage = lastPage-(groupSize-1) <= 0 ? 1 : lastPage-(groupSize-1);
 
-  //부트스트랩의 pagination
-  let paginationHTML=``;
+  //<부트스트랩의 pagination>
+  //page버튼 1페이지가 아닐때 <<(1페이지로)&<(page+1)버튼 생성
+  if(page!=1){
+    paginationHTML = `<li class="page-item" onclick="moveToPage(1)">
+                         <a class="page-link">&lt;&lt;</a>
+                        </li>
+                        <li class="page-item" onclick="moveToPage(${page - 1})">
+                          <a class="page-link">&lt;</a>
+                        </li>`;
+  }
 
+  //현재있는 페이지 버튼 파란색
   for(i=firstPage;i<=lastPage;i++){
     paginationHTML += `<li class="page-item ${i === page ? "active" :""}" onclick="moveToPage(${i})"><a class="page-link">${i}</a></li>` 
+  }
+  //page가 마지막 page가 아닐 때 >(page+1)&>>(마지막 페이지)의 버튼 생성
+  if(page!=totalPage){
+    paginationHTML+=`<li class="page-item" onclick="moveToPage(${page + 1})">
+    <a  class="page-link" href='#js-program-detail-bottom'>&gt;</a>
+   </li>
+   <li class="page-item" onclick="moveToPage(${totalPage})">
+    <a class="page-link" href='#js-bottom'>&gt;&gt;</a>
+   </li>`;
   }
 
   document.querySelector(".pagination").innerHTML=paginationHTML
 }
-
+//선택한 page를 보여주기
 const moveToPage = (pageNum) => {
   console.log("moveToPage",pageNum);
+  //천천히 위로 올라가는 scroll
+  window.scrollTo({ top: 0, behavior: "smooth" });
   page = pageNum;
   getNews();  //뉴스를 다시 가져오기
 }
